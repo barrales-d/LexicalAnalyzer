@@ -120,15 +120,19 @@ int main(int argc, char** argv) {
 	if(argc <= 0) {
 		fprintf(stderr, "ERROR: did not provide input file\n");
 		fprintf(stderr, "Usage: %s <input.c file> <output.txt file>\n", program);
+		fprintf(stderr, "    <input.c file>: is a required parameter\n");
+		fprintf(stderr, "    <output.txt file>: is an optional parameter\n");
+		fprintf(stderr, "        - DEFAULT: stdout\n");
 		return 1;
 	}
 	char* input_file_name = shift_args(&argc, &argv);
+	char* output_file_name;
 	if(argc <= 0) {
-		fprintf(stderr, "ERROR: did not provide output file\n");
-		fprintf(stderr, "Usage: %s <input.c file> <output.txt file>\n", program);
-		return 1;
+		output_file_name = NULL;
+	} else {
+		output_file_name = shift_args(&argc, &argv);
 	}
-	char* output_file_name = shift_args(&argc, &argv);
+		
 	Arena string_pool = arena_make();
 
     FILE* input_file = fopen(input_file_name, "r");
@@ -147,7 +151,12 @@ int main(int argc, char** argv) {
 	size_t tokens_count = 0;
     Token* tokens = lexer(&string_pool, source_code, &tokens_count);
 
-    FILE* output_file = fopen(output_file_name, "w");
+	FILE* output_file;
+	if(output_file_name) {
+    	output_file = fopen(output_file_name, "w");
+	} else {
+		output_file = stdout;
+	}
     if(output_file == NULL) {
         fprintf(stderr, "Error: Could not open file %s\n", output_file_name);
         return 1;
