@@ -109,12 +109,31 @@ Token* lexer(Arena* arena, const char* source, size_t* tcount)
 	return tokens;
 }
 
-int main(void) {
+char* shift_args(int* argc, char*** argv)
+{
+	char* ret_str = (*(*argv)++); 
+	(*argc)--;
+	return ret_str;
+}
+int main(int argc, char** argv) {
+	char* program = shift_args(&argc, &argv);
+	if(argc <= 0) {
+		fprintf(stderr, "ERROR: did not provide input file\n");
+		fprintf(stderr, "Usage: %s <input.c file> <output.txt file>\n", program);
+		return 1;
+	}
+	char* input_file_name = shift_args(&argc, &argv);
+	if(argc <= 0) {
+		fprintf(stderr, "ERROR: did not provide output file\n");
+		fprintf(stderr, "Usage: %s <input.c file> <output.txt file>\n", program);
+		return 1;
+	}
+	char* output_file_name = shift_args(&argc, &argv);
 	Arena string_pool = arena_make();
 
-    FILE* input_file = fopen("input.c", "r");
+    FILE* input_file = fopen(input_file_name, "r");
     if(input_file == NULL) {
-        fprintf(stderr, "Error: Could not open file 'input_scode.txt'\n");
+        fprintf(stderr, "Error: Could not open file %s\n", input_file_name);
         return 1;
     }
     fseek(input_file, 0, SEEK_END);
@@ -128,9 +147,9 @@ int main(void) {
 	size_t tokens_count = 0;
     Token* tokens = lexer(&string_pool, source_code, &tokens_count);
 
-    FILE* output_file = fopen("output.txt", "w");
+    FILE* output_file = fopen(output_file_name, "w");
     if(output_file == NULL) {
-        fprintf(stderr, "Error: Could not open file 'output.txt'\n");
+        fprintf(stderr, "Error: Could not open file %s\n", output_file_name);
         return 1;
     }
 
@@ -145,6 +164,6 @@ int main(void) {
     }
     fclose(output_file);
 	arena_free(&string_pool);
-	printf("Generated output.txt!\n");
+	printf("Generated %s from %s!\n", output_file_name, input_file_name);
     return 0;
 }

@@ -5,9 +5,8 @@ This Lexer parses C programs given a input source code(`input.c`) and outputs a 
 ## Quick Start
 ``` console
 $ clang main.c -o main
-$ ./main
+$ ./main <input.c file> <output.txt file>
 ```
-* *Note*: Right now, the input and output files are hard coded into main
 
 ### Input Source Code: `input.c`
     while (t < lower) r = 28.00;
